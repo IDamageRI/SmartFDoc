@@ -1,0 +1,8 @@
+# Зависимости для проекта системы управления документами
+Flask==3.0.0
+Werkzeug==3.0.1
+schedule==1.2.0
+python-docx==1.1.0
+PyPDF2==3.0.1
+openpyxl==3.1.2
+pypandoc==1.13

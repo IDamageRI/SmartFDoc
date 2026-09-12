@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система управления документами</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f7f7; /* Топлено-молочный фон */
+            color: #1a1a1a;
+            min-height: 100vh;
+        }
+        
+        /* Шрифт Sharp Grotesk */
+        .dwg-text {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        .dwg-font-family--sharp-grotesk-20-book {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        .dwg-font-size--24 {
+            font-size: 32px; /* Увеличили шрифт Авторизации */
+        }
+        
+        .dwg-font-weight--regular {
+            font-weight: 400;
+        }
+        
+        .dwg-line-height--30 {
+            line-height: 36px; /* Увеличили межстрочный интервал */
+        }
+        
+        .dwg-box {
+            display: block;
+        }
+        
+        .dwg-p--0 {
+            padding: 0;
+        }
+        
+        .dwg-m--0 {
+            margin: 0;
+        }
+        
+        .dwg-bg-color--transparent {
+            background-color: transparent;
+        }
+        
+        /* Полоса хедера на всю ширину - белее и тоньше */
+        .auth-header-full {
+            width: 100%;
+            background-color: #fff7f7;
+            border-bottom: 1px solid #e1e1e1;
+            padding: 15px 0; /* Уменьшили высоту строки */
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            width: 100%;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo {
+            width: 200px; /* Значительно увеличили логотип */
+            height: 50px; /* Значительно увеличили логотип */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: brightness(0.8) contrast(1.2); /* ЧБ эффект для логотипа */
+        }
+        
+        /* Стили для иконки глаза - открытое состояние */
+        .eye-icon {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #666 50%, transparent 50%),
+                        linear-gradient(-45deg, #666 50%, transparent 50%);
+            border-radius: 50%;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .eye-icon::before {
+            content: '';
+            position: absolute;
+            top: 25%;
+            left: 25%;
+            width: 8px;
+            height: 8px;
+            background: #666;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        /* Стили для иконки глаза - закрытое состояние */
+        .eye-icon.closed {
+            background: #666;
+        }
+        
+        .eye-icon.closed::before {
+            width: 16px;
+            height: 2px;
+            top: 45%;
+            left: 10%;
+            border-radius: 1px;
+            background: #fff;
+            transform: rotate(0deg);
+        }
+        
+        /* Основной контент авторизации */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 110px 20px 40px; /* Уменьшили отступ сверху из-за меньшей высоты хедера */
+        }
+        
+        .auth-content {
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .auth-title-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .auth-form {
+            background-color: transparent;
+            padding: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 14px;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+            background-color: #fff;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #749fe2;
+            box-shadow: 0 0 0 3px rgba(0, 97, 255, 0.1);
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            font-size: 16px;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toggle-password:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .btn-login {
+            background-color: #0061ff;
+            color: white;
+            border: none;
+            padding: 16px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+        
+        .btn-login:hover {
+            background-color: #0052d9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 97, 255, 0.3);
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        
+        .error-message {
+            background-color: #ffe6e6;
+            border: 1px solid #ffcccc;
+            color: #d00;
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 8px;
+            display: none;
+            font-size: 14px;
+        }
+        
+        .auth-footer {
+            text-align: center;
+            margin-top: 32px;
+            font-size: 14px;
+            color: #666;
+            padding: 16px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        /* Остальные стили основного интерфейса остаются без изменений */
+        .main-window {
+            display: none;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Полоса хедера на всю ширину -->
+    <div class="auth-header-full">
+        <div class="header-content">
+            <div class="logo">
+                <img src="ico.png" alt="Logo" onerror="this.style.display='none'">
+            </div>
+        </div>
+    </div>
+
+    <!-- Основной контент авторизации -->
+    <div id="auth-window">
+        <div class="auth-container">
+            <div class="auth-content">
+                <div class="auth-title-container">
+                    <div class="dwg-text dwg-font-family--sharp-grotesk-20-book dwg-font-size--24 dwg-font-weight--regular dwg-line-height--30 dwg-box dwg-p--0 dwg-m--0 dwg-bg-color--transparent">
+                        Авторизация
+                    </div>
+                </div>
+                
+                <div class="auth-form">
+                    <div id="error-message" class="error-message">
+                        Неверные данные для входа. Проверьте логин и пароль.
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="user-select">Пользователь</label>
+                        <select id="user-select">
+                            <option value="">-- Выберите пользователя --</option>
+                            <option value="admin">Администратор Системы</option>
+                            <option value="manager">Петров Иван (Менеджер отдела продаж)</option>
+                            <option value="user">Сидорова Мария (Бухгалтерия)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Пароль</label>
+                        <div class="password-container">
+                            <input type="password" id="password" placeholder="Введите пароль">
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                                <div class="eye-icon"></div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-login" onclick="login()">
+                        Войти в систему
+                    </button>
+                    
+                    <div class="auth-footer">
+                        <p>Для тестирования используйте пароль: <strong>123</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Главное окно (скрыто до авторизации) - БЕЗ ИЗМЕНЕНИЙ -->
+    <div id="main-window" class="main-window">
+        <!-- Существующий код основного интерфейса остается без изменений -->
+    </div>
+
+    <script>
+        // Данные пользователей
+        const users = {
+            'admin': {
+                password: '123',
+                name: 'Администратор Системы',
+                role: 'admin',
+                department: 'Все отделы'
+            },
+            'manager': {
+                password: '123',
+                name: 'Петров Иван',
+                role: 'manager',
+                department: 'Отдел продаж'
+            },
+            'user': {
+                password: '123',
+                name: 'Сидорова Мария',
+                role: 'user',
+                department: 'Бухгалтерия'
+            }
+        };
+
+        let currentUser = null;
+        let isPasswordVisible = false;
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.querySelector('.eye-icon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.add('closed');
+                isPasswordVisible = true;
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('closed');
+                isPasswordVisible = false;
+            }
+        }
+
+        function login() {
+            const username = document.getElementById('user-select').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+            
+            if (username && password && users[username] && users[username].password === password) {
+                currentUser = users[username];
+                document.getElementById('auth-window').style.display = 'none';
+                document.getElementById('main-window').style.display = 'block';
+                // initializeInterface(); // Эта функция остается в основном коде
+            } else {
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('auth-window').style.display = 'block';
+            document.getElementById('main-window').style.display = 'none';
+            document.getElementById('user-select').selectedIndex = 0;
+            document.getElementById('password').value = '';
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('password').type = 'password';
+            // Сбрасываем иконку глаза в открытое состояние
+            const eyeIcon = document.querySelector('.eye-icon');
+            eyeIcon.classList.remove('closed');
+            isPasswordVisible = false;
+        }
+
+        document.getElementById('password').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
+</body>
+</html>

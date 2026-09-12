@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система управления документами</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            font-weight: bold;
+            font-size: 24px;
+            color: #2c3e50;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-role {
+            background-color: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-item:hover {
+            background-color: #e9ecef;
+        }
+        
+        .nav-item.active {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+        
+        .sidebar {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .main-content {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 600px;
+        }
+        
+        .auth-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .auth-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .welcome-message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #7f8c8d;
+        }
+        
+        .section-title {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: #2c3e50;
+        }
+        
+        /* Стили для документов */
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .document-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .document-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .document-icon {
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+        
+        .document-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .document-type {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .document-date {
+            color: #95a5a6;
+            font-size: 12px;
+            text-align: right;
+        }
+        
+        /* Стили для классификации */
+        .classification-form {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-field {
+            flex: 1;
+        }
+        
+        .form-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-field input, .form-field select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        /* Стили для поиска */
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .search-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .search-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        /* Стили для источников */
+        .sources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .source-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        
+        .source-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .source-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+        
+        /* Стили для статистики */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #2c3e50;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        /* Стили для личного кабинета */
+        .personal-cabinet {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .cabinet-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .cabinet-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .cabinet-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .cabinet-stat-card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .cabinet-stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #2c3e50;
+        }
+        
+        .cabinet-stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .orders-table th, .orders-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .orders-table th {
+            background-color: #f0f0f0;
+            font-weight: normal;
+        }
+        
+        .order-row {
+            cursor: pointer;
+        }
+        
+        .order-row:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .status-new {
+            color: #4CAF50;
+        }
+        
+        .status-pending {
+            color: #FF9800;
+        }
+        
+        .status-sent {
+            color: #2196F3;
+        }
+        
+        /* Стили для модальных окон */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .modal-title {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        /* Стили для таблиц */
+        .documents-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .documents-table th, .documents-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .documents-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .documents-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #3498db;
+            margin-right: 10px;
+        }
+        
+        /* Стили для боковой панели */
+        .filters {
+            margin-bottom: 20px;
+        }
+        
+        .filter-group {
+            margin-bottom: 15px;
+        }
+        
+        .filter-group h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .filter-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .filter-option input {
+            margin-right: 10px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: #3498db;
+        }
+        
+        .upload-icon {
+            font-size: 40px;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .access-denied {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .access-denied-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        /* Стили для отображения документа */
+        .document-view {
+            line-height: 1.6;
+        }
+        
+        .document-view h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .document-view h2 {
+            font-size: 20px;
+            margin: 25px 0 15px 0;
+            color: #2c3e50;
+        }
+        
+        .document-view ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .document-view li {
+            margin-bottom: 8px;
+        }
+        
+        .document-view hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 25px 0;
+        }
+        
+        .document-actions {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .document-actions .btn {
+            width: auto;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .file-info {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- Окно авторизации -->
+    <div id="auth-window" class="auth-container">
+        <h2 class="auth-title">Авторизация</h2>
+        <div class="form-group">
+            <label for="user-select">Выберите пользователя</label>
+            <select id="user-select">
+                <option value="">-- Выберите пользователя --</option>
+                <option value="admin">Администратор (admin / 123)</option>
+                <option value="manager">Менеджер отдела (manager / 123)</option>
+                <option value="user">Обычный пользователь (user / 123)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" placeholder="Введите пароль">
+        </div>
+        <button class="btn" onclick="login()">Авторизироваться</button>
+        <div class="welcome-message">Добро пожаловать!</div>
+    </div>
+
+    <!-- Главное окно (скрыто до авторизации) -->
+    <div id="main-window" style="display: none;">
+        <div class="container">
+            <div class="header">
+                <div class="logo">Документооборот</div>
+                <div class="nav" id="main-nav">
+                    <!-- Навигация будет заполнена скриптом в зависимости от роли -->
+                </div>
+                <div class="user-info">
+                    <span id="current-user">Пользователь</span>
+                    <span class="user-role" id="user-role">Роль</span>
+                    <button class="btn" style="width: auto; padding: 8px 15px;" onclick="logout()">Выйти</button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="sidebar" id="sidebar-content">
+                    <!-- Боковая панель будет заполнена скриптом в зависимости от роли -->
+                </div>
+                
+                <div class="main-content">
+                    <!-- Секция документов -->
+                    <div id="documents-section">
+                        <h2 class="section-title">Документы</h2>
+                        <div id="documents-content">
+                            <!-- Содержимое будет заполнено скриптом в зависимости от роли -->
+                        </div>
+                    </div>
+                    
+                    <!-- Секция классификации -->
+                    <div id="classification-section" style="display: none;">
+                        <h2 class="section-title">Классификация документов</h2>
+                        <div id="classification-content">
+                            <!-- Содержимое будет заполнено скриптом в зависимости от роли -->
+                        </div>
+                    </div>
+                    
+                    <!-- Секция источников -->
+                    <div id="sources-section" style="display: none;">
+                        <h2 class="section-title">Источники документов</h2>
+                        <div id="sources-content">
+                            <!-- Содержимое будет заполнено скриптом в зависимости от роли -->
+                        </div>
+                    </div>
+                    
+                    <!-- Секция поиска -->
+                    <div id="search-section" style="display: none;">
+                        <h2 class="section-title">Поиск документов</h2>
+                        <div id="search-content">
+                            <!-- Содержимое будет заполнено скриптом в зависимости от роли -->
+                        </div>
+                    </div>
+                    
+                    <!-- Секция статистики -->
+                    <div id="stats-section" style="display: none;">
+                        <h2 class="section-title">Статистика и мониторинг</h2>
+                        <div id="stats-content">
+                            <!-- Содержимое будет заполнено скриптом в зависимости от роли -->
+                        </div>
+                    </div>
+                    
+                    <!-- Секция личного кабинета -->
+                    <div id="personal-section" style="display: none;">
+                        <h2 class="section-title">Личный кабинет</h2>
+                        <div id="personal-content">
+                            <!-- Содержимое будет заполнено скриптом в зависимости от роли -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для деталей документа -->
+    <div id="document-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('document-modal')">&times;</span>
+            <div id="document-modal-content">
+                <!-- Содержимое будет загружено здесь -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для загрузки документа -->
+    <div id="upload-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('upload-modal')">&times;</span>
+            <h2 class="modal-title">Загрузка документа</h2>
+            <div class="form-group">
+                <label for="upload-file">Выберите файл</label>
+                <input type="file" id="upload-file" accept=".doc,.docx,.pdf,.rtf,.xlsx,.jpg,.jpeg">
+                <div class="file-info">Допустимые форматы: Word (.doc, .docx), PDF (.pdf), RTF (.rtf), Excel (.xlsx), JPG (.jpg, .jpeg)</div>
+            </div>
+            <div class="form-group">
+                <label for="upload-type">Тип документа</label>
+                <select id="upload-type">
+                    <option value="">Автоопределение</option>
+                    <option value="contract">Договор</option>
+                    <option value="invoice">Счет</option>
+                    <option value="order">Приказ</option>
+                    <option value="report">Отчет</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="upload-counterparty">Контрагент</label>
+                <input type="text" id="upload-counterparty" placeholder="Введите название контрагента">
+            </div>
+            <button class="btn">Загрузить документ</button>
+        </div>
+    </div>
+
+    <script>
+        // Данные пользователей
+        const users = {
+            'admin': {
+                password: '123',
+                name: 'Администратор Системы',
+                role: 'admin',
+                department: 'Все отделы'
+            },
+            'manager': {
+                password: '123',
+                name: 'Петров Иван',
+                role: 'manager',
+                department: 'Отдел продаж'
+            },
+            'user': {
+                password: '123',
+                name: 'Сидорова Мария',
+                role: 'user',
+                department: 'Бухгалтерия'
+            }
+        };
+
+        // Данные документов
+        const documents = {
+            'all': [
+                {id: 1, name: 'Договор поставки №245', type: 'Договор', department: 'Отдел продаж', date: '15.03.2023', editable: true, counterparty: 'ООО "Ромашка"', status: 'Образовательная', source: 'Электронная почта', tags: 'договор, поставка, 2023', note: 'Договор подписан всеми сторонами, ожидается поставка товара.'},
+                {id: 2, name: 'Счет на оплату №784', type: 'Счет', department: 'Бухгалтерия', date: '12.03.2023', editable: true, counterparty: 'ЗАО "Весна"', status: 'Обработан', source: 'Файловая система', tags: 'счет, оплата', note: 'Счет выставлен, ожидается оплата.'},
+                {id: 3, name: 'Приказ о назначении', type: 'Приказ', department: 'Отдел кадров', date: '10.03.2023', editable: true, counterparty: 'ИП Сидоров', status: 'Утвержден', source: 'Электронная почта', tags: 'приказ, кадры', note: 'Приказ вступил в силу с 10.03.2023.'},
+                {id: 4, name: 'Отчет за февраль 2023', type: 'Отчет', department: 'Бухгалтерия', date: '05.03.2023', editable: true, counterparty: 'ООО "Ромашка"', status: 'Проверен', source: 'Веб-источник', tags: 'отчет, февраль', note: 'Отчет проверен бухгалтерией.'},
+                {id: 5, name: 'Договор аренды №112', type: 'Договор', department: 'Юридический отдел', date: '28.02.2023', editable: true, counterparty: 'ЗАО "Весна"', status: 'Действующий', source: 'Электронная почта', tags: 'договор, аренда', note: 'Договор аренды помещения.'},
+                {id: 6, name: 'Счет на оплату №652', type: 'Счет', department: 'Бухгалтерия', date: '25.02.2023', editable: true, counterparty: 'ИП Сидоров', status: 'Оплачен', source: 'Файловая система', tags: 'счет, оплачен', note: 'Счет оплачен 01.03.2023.'}
+            ],
+            'sales': [
+                {id: 1, name: 'Договор поставки №245', type: 'Договор', department: 'Отдел продаж', date: '15.03.2023', editable: true, counterparty: 'ООО "Ромашка"', status: 'Образовательная', source: 'Электронная почта', tags: 'договор, поставка, 2023', note: 'Договор подписан всеми сторонами, ожидается поставка товара.'},
+                {id: 7, name: 'Коммерческое предложение', type: 'Предложение', department: 'Отдел продаж', date: '20.03.2023', editable: true, counterparty: 'ООО "Технопром"', status: 'Отправлено', source: 'Электронная почта', tags: 'предложение, коммерческое', note: 'Отправлено клиенту для рассмотрения.'}
+            ],
+            'accounting': [
+                {id: 2, name: 'Счет на оплату №784', type: 'Счет', department: 'Бухгалтерия', date: '12.03.2023', editable: true, counterparty: 'ЗАО "Весна"', status: 'Обработан', source: 'Файловая система', tags: 'счет, оплата', note: 'Счет выставлен, ожидается оплата.'},
+                {id: 4, name: 'Отчет за февраль 2023', type: 'Отчет', department: 'Бухгалтерия', date: '05.03.2023', editable: true, counterparty: 'ООО "Ромашка"', status: 'Проверен', source: 'Веб-источник', tags: 'отчет, февраль', note: 'Отчет проверен бухгалтерией.'},
+                {id: 6, name: 'Счет на оплату №652', type: 'Счет', department: 'Бухгалтерия', date: '25.02.2023', editable: true, counterparty: 'ИП Сидоров', status: 'Оплачен', source: 'Файловая система', tags: 'счет, оплачен', note: 'Счет оплачен 01.03.2023.'}
+            ]
+        };
+
+        // Текущий пользователь
+        let currentUser = null;
+
+        // Функция авторизации
+        function login() {
+            const username = document.getElementById('user-select').value;
+            const password = document.getElementById('password').value;
+            
+            if (username && password && users[username] && users[username].password === password) {
+                currentUser = users[username];
+                document.getElementById('auth-window').style.display = 'none';
+                document.getElementById('main-window').style.display = 'block';
+                initializeInterface();
+            } else {
+                alert('Неверные данные для входа');
+            }
+        }
+
+        // Функция выхода
+        function logout() {
+            currentUser = null;
+            document.getElementById('auth-window').style.display = 'block';
+            document.getElementById('main-window').style.display = 'none';
+            document.getElementById('user-select').selectedIndex = 0;
+            document.getElementById('password').value = '';
+        }
+
+        // Инициализация интерфейса в зависимости от роли
+        function initializeInterface() {
+            // Обновляем информацию о пользователе
+            document.getElementById('current-user').textContent = currentUser.name;
+            document.getElementById('user-role').textContent = getRoleName(currentUser.role);
+            
+            // Настраиваем навигацию
+            setupNavigation();
+            
+            // Настраиваем боковую панель
+            setupSidebar();
+            
+            // Показываем документы по умолчанию
+            showSection('documents');
+        }
+
+        // Получить название роли
+        function getRoleName(role) {
+            switch(role) {
+                case 'admin': return 'Администратор';
+                case 'manager': return 'Менеджер';
+                case 'user': return 'Пользователь';
+                default: return 'Неизвестно';
+            }
+        }
+
+        // Настройка навигации
+        function setupNavigation() {
+            const nav = document.getElementById('main-nav');
+            nav.innerHTML = '';
+            
+            // Общие пункты для всех ролей
+            const commonItems = [
+                {id: 'documents', name: 'Документы'}
+            ];
+            
+            // Пункты для администратора
+            const adminItems = [
+                {id: 'classification', name: 'Классификация'},
+                {id: 'sources', name: 'Источники'},
+                {id: 'search', name: 'Поиск'},
+                {id: 'stats', name: 'Статистика'}
+            ];
+            
+            // Пункты для менеджера и пользователя
+            const userItems = [
+                {id: 'search', name: 'Поиск'},
+                {id: 'personal', name: 'Личный кабинет'}
+            ];
+            
+            // Добавляем общие пункты
+            commonItems.forEach(item => {
+                const navItem = document.createElement('div');
+                navItem.className = 'nav-item';
+                navItem.textContent = item.name;
+                navItem.onclick = () => showSection(item.id);
+                nav.appendChild(navItem);
+            });
+            
+            // Добавляем специфичные пункты
+            if (currentUser.role === 'admin') {
+                adminItems.forEach(item => {
+                    const navItem = document.createElement('div');
+                    navItem.className = 'nav-item';
+                    navItem.textContent = item.name;
+                    navItem.onclick = () => showSection(item.id);
+                    nav.appendChild(navItem);
+                });
+            } else {
+                userItems.forEach(item => {
+                    const navItem = document.createElement('div');
+                    navItem.className = 'nav-item';
+                    navItem.textContent = item.name;
+                    navItem.onclick = () => showSection(item.id);
+                    nav.appendChild(navItem);
+                });
+            }
+            
+            // Активируем первый пункт
+            if (nav.firstChild) {
+                nav.firstChild.classList.add('active');
+            }
+        }
+
+        // Настройка боковой панели
+        function setupSidebar() {
+            const sidebar = document.getElementById('sidebar-content');
+            
+            if (currentUser.role === 'admin') {
+                sidebar.innerHTML = `
+                    <h3 class="section-title">Фильтры</h3>
+                    <div class="filters">
+                        <div class="filter-group">
+                            <h4>Отдел</h4>
+                            <div class="filter-option">
+                                <input type="checkbox" id="dept-all" checked>
+                                <label for="dept-all">Все отделы</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="dept-sales" checked>
+                                <label for="dept-sales">Отдел продаж</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="dept-accounting" checked>
+                                <label for="dept-accounting">Бухгалтерия</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="dept-hr" checked>
+                                <label for="dept-hr">Отдел кадров</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="upload-area" onclick="showUploadModal()">
+                        <div class="upload-icon">📁</div>
+                        <h3>Загрузить документ</h3>
+                        <p>Перетащите файлы сюда или нажмите для выбора</p>
+                        <div class="file-info">Допустимые форматы: Word, PDF, RTF, Excel, JPG</div>
+                    </div>
+                `;
+            } else {
+                let departmentDocs = [];
+                if (currentUser.department === 'Отдел продаж') {
+                    departmentDocs = documents.sales;
+                } else if (currentUser.department === 'Бухгалтерия') {
+                    departmentDocs = documents.accounting;
+                }
+                
+                sidebar.innerHTML = `
+                    <h3 class="section-title">Мои документы</h3>
+                    <p><strong>Отдел:</strong> ${currentUser.department}</p>
+                    <p><strong>Доступно документов:</strong> ${departmentDocs.length}</p>
+                    <div class="upload-area" onclick="showUploadModal()">
+                        <div class="upload-icon">📁</div>
+                        <h3>Загрузить документ</h3>
+                        <p>Только для вашего отдела</p>
+                        <div class="file-info">Допустимые форматы: Word, PDF, RTF, Excel, JPG</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Функция переключения между разделами
+        function showSection(sectionName) {
+            // Скрыть все секции
+            document.getElementById('documents-section').style.display = 'none';
+            document.getElementById('classification-section').style.display = 'none';
+            document.getElementById('sources-section').style.display = 'none';
+            document.getElementById('search-section').style.display = 'none';
+            document.getElementById('stats-section').style.display = 'none';
+            document.getElementById('personal-section').style.display = 'none';
+            
+            // Показать выбранную секцию
+            document.getElementById(sectionName + '-section').style.display = 'block';
+            
+            // Обновить активную навигацию
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Загрузить содержимое секции
+            loadSectionContent(sectionName);
+        }
+
+        // Загрузка содержимого секции
+        function loadSectionContent(sectionName) {
+            switch(sectionName) {
+                case 'documents':
+                    loadDocumentsContent();
+                    break;
+                case 'classification':
+                    loadClassificationContent();
+                    break;
+                case 'sources':
+                    loadSourcesContent();
+                    break;
+                case 'search':
+                    loadSearchContent();
+                    break;
+                case 'stats':
+                    loadStatsContent();
+                    break;
+                case 'personal':
+                    loadPersonalContent();
+                    break;
+            }
+        }
+
+        // Загрузка документов
+        function loadDocumentsContent() {
+            const content = document.getElementById('documents-content');
+            let userDocuments = [];
+            
+            if (currentUser.role === 'admin') {
+                userDocuments = documents.all;
+            } else if (currentUser.department === 'Отдел продаж') {
+                userDocuments = documents.sales;
+            } else if (currentUser.department === 'Бухгалтерия') {
+                userDocuments = documents.accounting;
+            }
+            
+            if (userDocuments.length === 0) {
+                content.innerHTML = '<p>Нет доступных документов</p>';
+                return;
+            }
+            
+            let html = '<div class="documents-grid">';
+            userDocuments.forEach(doc => {
+                html += `
+                    <div class="document-card" onclick="showDocumentDetails(${doc.id})">
+                        <div class="document-icon">📄</div>
+                        <div class="document-name">${doc.name}</div>
+                        <div class="document-type">${doc.type} • ${doc.department}</div>
+                        <div class="document-date">${doc.date}</div>
+                        ${doc.editable ? '<div style="color: green; font-size: 12px; margin-top: 5px;">Редактируемый</div>' : ''}
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            content.innerHTML = html;
+        }
+
+        // Загрузка классификации (только для админа)
+        function loadClassificationContent() {
+            const content = document.getElementById('classification-content');
+            
+            if (currentUser.role !== 'admin') {
+                content.innerHTML = `
+                    <div class="access-denied">
+                        <div class="access-denied-icon">🚫</div>
+                        <h3>Доступ запрещен</h3>
+                        <p>У вас недостаточно прав для просмотра этого раздела</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            content.innerHTML = `
+                <div class="classification-form">
+                    <h3>Правила автоматической классификации</h3>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="rule-name">Название правила</label>
+                            <input type="text" id="rule-name" placeholder="Введите название правила">
+                        </div>
+                        <div class="form-field">
+                            <label for="rule-priority">Приоритет</label>
+                            <select id="rule-priority">
+                                <option value="high">Высокий</option>
+                                <option value="medium" selected>Средний</option>
+                                <option value="low">Низкий</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn">Добавить правило</button>
+                </div>
+                <h3>Активные правила</h3>
+                <table class="documents-table">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Условие</th>
+                            <th>Действие</th>
+                            <th>Приоритет</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Договоры по названию</td>
+                            <td>Имя файла содержит "договор"</td>
+                            <td>Присвоить категорию "Договоры"</td>
+                            <td>Высокий</td>
+                        </tr>
+                        <tr>
+                            <td>Счета от ООО "Ромашка"</td>
+                            <td>Источник = email@romashka.ru</td>
+                            <td>Назначить контрагента "ООО Ромашка"</td>
+                            <td>Средний</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Загрузка источников (только для админа)
+        function loadSourcesContent() {
+            const content = document.getElementById('sources-content');
+            
+            if (currentUser.role !== 'admin') {
+                content.innerHTML = `
+                    <div class="access-denied">
+                        <div class="access-denied-icon">🚫</div>
+                        <h3>Доступ запрещен</h3>
+                        <p>У вас недостаточно прав для просмотра этого раздела</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            content.innerHTML = `
+                <div class="sources-grid">
+                    <div class="source-card">
+                        <div class="source-icon">📧</div>
+                        <h3>Электронная почта</h3>
+                        <p>Настроено: 3 ящика</p>
+                    </div>
+                    <div class="source-card">
+                        <div class="source-icon">📁</div>
+                        <h3>Файловая система</h3>
+                        <p>Мониторинг: 5 папок</p>
+                    </div>
+                    <div class="source-card">
+                        <div class="source-icon">🌐</div>
+                        <h3>Web-источники</h3>
+                        <p>Настроено: 2 источника</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Загрузка поиска
+        function loadSearchContent() {
+            const content = document.getElementById('search-content');
+            
+            content.innerHTML = `
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Введите текст для поиска...">
+                    <button class="search-btn">Найти</button>
+                </div>
+                <div class="filters">
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="search-type">Тип поиска</label>
+                            <select id="search-type">
+                                <option value="fulltext">Полнотекстовый поиск</option>
+                                <option value="metadata">По метаданным</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label for="search-date">Дата документа</label>
+                            <input type="date" id="search-date">
+                        </div>
+                    </div>
+                </div>
+                <h3>Результаты поиска</h3>
+                <p>Введите запрос для поиска документов</p>
+            `;
+        }
+
+        // Загрузка статистики (только для админа)
+        function loadStatsContent() {
+            const content = document.getElementById('stats-content');
+            
+            if (currentUser.role !== 'admin') {
+                content.innerHTML = `
+                    <div class="access-denied">
+                        <div class="access-denied-icon">🚫</div>
+                        <h3>Доступ запрещен</h3>
+                        <p>У вас недостаточно прав для просмотра этого раздела</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            content.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">1,248</div>
+                        <div class="stat-label">Всего документов</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">347</div>
+                        <div class="stat-label">Обработано автоматически</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Обнаружено дубликатов</div>
+                    </div>
+                </div>
+                <h3>Распределение по отделам</h3>
+                <table class="documents-table">
+                    <thead>
+                        <tr>
+                            <th>Отдел</th>
+                            <th>Количество</th>
+                            <th>Доля</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Бухгалтерия</td>
+                            <td>421</td>
+                            <td>33.7%</td>
+                        </tr>
+                        <tr>
+                            <td>Отдел продаж</td>
+                            <td>385</td>
+                            <td>30.8%</td>
+                        </tr>
+                        <tr>
+                            <td>Юридический отдел</td>
+                            <td>217</td>
+                            <td>17.4%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Загрузка личного кабинета
+        function loadPersonalContent() {
+            const content = document.getElementById('personal-content');
+            
+            let userDocuments = [];
+            if (currentUser.department === 'Отдел продаж') {
+                userDocuments = documents.sales;
+            } else if (currentUser.department === 'Бухгалтерия') {
+                userDocuments = documents.accounting;
+            }
+            
+            const myDocuments = userDocuments.filter(d => d.editable).length;
+            const pendingDocuments = 2; // Примерное значение
+            const sentDocuments = 5; // Примерное значение
+            
+            content.innerHTML = `
+                <div class="personal-cabinet">
+                    <div class="cabinet-section">
+                        <h3>Моя статистика</h3>
+                        
+                        <div class="cabinet-stats">
+                            <div class="cabinet-stat-card">
+                                <div class="cabinet-stat-value">${myDocuments}</div>
+                                <div class="cabinet-stat-label">Мои документы</div>
+                            </div>
+                            <div class="cabinet-stat-card">
+                                <div class="cabinet-stat-value">${pendingDocuments}</div>
+                                <div class="cabinet-stat-label">Неподтвержденные</div>
+                            </div>
+                            <div class="cabinet-stat-card">
+                                <div class="cabinet-stat-value">${sentDocuments}</div>
+                                <div class="cabinet-stat-label">Отправленные</div>
+                            </div>
+                            <div class="cabinet-stat-card">
+                                <div class="cabinet-stat-value">${userDocuments.length}</div>
+                                <div class="cabinet-stat-label">Всего в отделе</div>
+                            </div>
+                        </div>
+                        
+                        <h4>Последние действия</h4>
+                        <ul>
+                            <li>Загружен документ "Отчет за март" - 20.03.2023</li>
+                            <li>Отредактирован договор №245 - 18.03.2023</li>
+                            <li>Отправлен счет №784 - 15.03.2023</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="cabinet-section">
+                        <h3>Отправленные документы</h3>
+                        <table class="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>№ документа</th>
+                                    <th>Тип</th>
+                                    <th>Дата</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="order-row">
+                                    <td>245</td>
+                                    <td>Договор</td>
+                                    <td>15.03.2023</td>
+                                    <td class="status-sent">Отправлен</td>
+                                </tr>
+                                <tr class="order-row">
+                                    <td>784</td>
+                                    <td>Счет</td>
+                                    <td>12.03.2023</td>
+                                    <td class="status-pending">Ожидает подписи</td>
+                                </tr>
+                                <tr class="order-row">
+                                    <td>112</td>
+                                    <td>Договор</td>
+                                    <td>10.03.2023</td>
+                                    <td class="status-sent">Отправлен</td>
+                                </tr>
+                                <tr class="order-row">
+                                    <td>652</td>
+                                    <td>Счет</td>
+                                    <td>05.03.2023</td>
+                                    <td class="status-new">Новый</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Функция показа деталей документа
+        function showDocumentDetails(docId) {
+            const modal = document.getElementById('document-modal');
+            const content = document.getElementById('document-modal-content');
+            
+            // Найти документ по ID
+            let doc;
+            if (currentUser.role === 'admin') {
+                doc = documents.all.find(d => d.id === docId);
+            } else if (currentUser.department === 'Отдел продаж') {
+                doc = documents.sales.find(d => d.id === docId);
+            } else if (currentUser.department === 'Бухгалтерия') {
+                doc = documents.accounting.find(d => d.id === docId);
+            }
+            
+            if (!doc) {
+                content.innerHTML = '<p>Документ не найден</p>';
+                modal.style.display = 'block';
+                return;
+            }
+            
+            // Проверка прав на редактирование
+            const canEdit = currentUser.role === 'admin' || 
+                           (currentUser.role === 'manager' && doc.department === currentUser.department) ||
+                           (currentUser.role === 'user' && doc.department === currentUser.department);
+            
+            content.innerHTML = `
+                <div class="document-view">
+                    <h1>Документ №${doc.id}</h1>
+                    
+                    <h2>Название</h2>
+                    <ul>
+                        <li>${doc.name}</li>
+                        <li>Тип
+                            <ul>
+                                <li>${doc.type}</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    
+                    <h2>Контрагент</h2>
+                    <ul>
+                        <li>${doc.counterparty}</li>
+                        <li>Дата создания
+                            <ul>
+                                <li>${doc.date}</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    
+                    <h2>Статус</h2>
+                    <ul>
+                        <li>${doc.status}</li>
+                        <li>Источник
+                            <ul>
+                                <li>${doc.source}</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    
+                    <h2>Теги</h2>
+                    <ul>
+                        <li>${doc.tags}</li>
+                    </ul>
+                    
+                    <h2>Примечание</h2>
+                    <p>${doc.note}</p>
+                    
+                    <hr>
+                    
+                    <div class="document-actions">
+                        <button class="btn">Скачать документ</button>
+                        ${canEdit ? '<button class="btn btn-danger">Удалить</button>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+        
+        // Функция показа модального окна загрузки
+        function showUploadModal() {
+            document.getElementById('upload-modal').style.display = 'block';
+        }
+        
+        // Функция закрытия модального окна
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Закрытие модального окна при клике вне его
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
